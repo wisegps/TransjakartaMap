@@ -49,8 +49,8 @@ public class Announcement extends Activity {
 	};
 	private void init(){
 		lv_Announcement = (ListView)findViewById(R.id.lv_Announcement);
-		String url = "http://www.wiselbs.cn/wspub/service.asmx/GetAnnouncementInfo_json";
-		new Thread(new NetThread.GetDataThread(handler, url, GetData)).start();
+		//String url = "http://www.wiselbs.cn/wspub/service.asmx/GetAnnouncementInfo_json";
+		//new Thread(new NetThread.GetDataThread(handler, url, GetData)).start();
 	}
 	/**
 	 * ½âÎöÊý¾Ý

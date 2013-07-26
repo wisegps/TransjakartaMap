@@ -2,7 +2,7 @@ package com.wise.config;
 
 public class UrlConfig {
 	//链接地址
-	public static final String url = "http://202.78.201.146:8765/wspubsc/Service.asmx";
+	public static final String url = "http://www.wiselbs.cn/wspubsc/service.asmx";
 	//命名空间
 	public static final String nameSpace = "http://tempuri.org/";
 	//获取线路
