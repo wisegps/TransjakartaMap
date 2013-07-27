@@ -131,4 +131,25 @@ public class WebService {
     	ht.call(nameSpace + methodName, envelope);
 		return envelope.bodyIn.toString();
 	}
+	/**
+	 * 获取最新的通知
+	 * @param url
+	 * @param nameSpace
+	 * @param methodName
+	 * @param timeout
+	 * @return
+	 * @throws Exception
+	 */
+	public static String GetAnnouncementInfo(String url , String nameSpace ,String methodName , int timeout) throws Exception{
+		SoapObject request = new SoapObject(nameSpace, methodName);
+    	request.addProperty("min", 0);
+    	request.addProperty("max", 1);
+    	SoapSerializationEnvelope envelope = new SoapSerializationEnvelope(SoapEnvelope.VER11);
+    	envelope.setOutputSoapObject(request);
+    	envelope.dotNet = true;
+    	HttpTransportSE ht = new HttpTransportSE(url,timeout);
+    	ht.call(nameSpace + methodName, envelope);
+		SoapObject result = (SoapObject)envelope.getResponse();		
+		return result.toString();
+	}
 }

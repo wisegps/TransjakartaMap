@@ -1,68 +1,71 @@
 package com.wise.activity;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import com.wise.bean.RoadInfo;
-import com.wise.config.UrlConfig;
-import com.wise.net.NetThread;
-
-import android.app.Activity;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Message;
-import android.widget.ArrayAdapter;
-import android.widget.AutoCompleteTextView;
-import android.widget.Toast;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.View.OnClickListener;
+import android.widget.Button;
+import android.widget.ViewFlipper;
+import com.google.android.maps.MapActivity;
 
-public class InfoSearchActivity extends Activity {
-	
-	private AutoCompleteTextView actv = null;
-	private MyHandler myHandler = null;
-	private List<String> roadLine = null;
-	
-	protected void onCreate(Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);
-		setContentView(R.layout.info_search);
-		actv = (AutoCompleteTextView) findViewById(R.id.et_ListSearch);
-		roadLine = new ArrayList<String>();
-		myHandler = new MyHandler();
-		new Thread(new NetThread.GetRodListThread(myHandler, UrlConfig.url, UrlConfig.nameSpace, UrlConfig.MethodGetRoadName, UrlConfig.timeout, 14)).start();
+public class InfoSearchActivity extends MapActivity {
+	ViewFlipper flipper;
+	Button bt_Route_Info,bt_Station_Info,bt_Closest_Info,bt_Navigation;
+	@Override
+	protected void onCreate(Bundle icicle) {
+		super.onCreate(icicle);
+		init();
 	}
 	
-	
-	//获取自动补全框中的内容
-	class MyHandler extends Handler{
-		String result;
-		public void handleMessage(Message msg) {
-			super.handleMessage(msg);
-			switch(msg.what){
-			case 14:
-				if(roadLine.size() > 0){
-					roadLine.clear();
-				}
-				result = msg.obj.toString();
-				String[] array1 = result.split("Road=anyType");
-				String[] array2 = null;
-				ArrayList<String[]> lists = new ArrayList<String[]>();
-				for(int i = 1 ; i < array1.length ; i++){
-					array2 = array1[i].split("; ");
-					lists.add(array2);
-				}
-				for(int i = 0; i < lists.size() ; i ++){
-					String[] str = lists.get(i);
-					if(str[i].indexOf("=") > 0){
-						roadLine.add(str[1].substring(str[1].indexOf("=") + 1));
-					}
-				}
-				ArrayAdapter<String> adapter = new ArrayAdapter<String>(InfoSearchActivity.this,android.R.layout.simple_dropdown_item_1line, roadLine);
-				actv.setAdapter(adapter);
-				actv.setThreshold(0);
-				
-				
-				
+	OnClickListener onClickListener = new OnClickListener() {		
+		@Override
+		public void onClick(View v) {
+			switch (v.getId()) {
+			case R.id.bt_Route_Info:
+				flipper.setDisplayedChild(0);
+				break;
+			case R.id.bt_Station_Info:		
+				flipper.setDisplayedChild(1);
+				System.out.println("1");
+				break;
+			case R.id.bt_Closest_Info:	
+				flipper.setDisplayedChild(2);
+				break;
+			case R.id.bt_Navigation:
+				flipper.setDisplayedChild(3);
 				break;
 			}
 		}
+	};
+	
+	private void init(){
+		setContentView(R.layout.info_search);
+		bt_Route_Info = (Button)findViewById(R.id.bt_Route_Info);
+		bt_Route_Info.setOnClickListener(onClickListener);
+		bt_Station_Info = (Button)findViewById(R.id.bt_Station_Info);
+		bt_Station_Info.setOnClickListener(onClickListener);
+		bt_Closest_Info = (Button)findViewById(R.id.bt_Closest_Info);
+		bt_Closest_Info.setOnClickListener(onClickListener);
+		bt_Navigation = (Button)findViewById(R.id.bt_Navigation);
+		bt_Navigation.setOnClickListener(onClickListener);
+		
+		flipper = (ViewFlipper) this.findViewById(R.id.viewFlipper);
+        LayoutInflater mLayoutInflater = LayoutInflater.from(InfoSearchActivity.this);        
+        //Route Info
+        View routeView = mLayoutInflater.inflate(R.layout.route_info, null);
+		flipper.addView(routeView);
+		//station info
+        View stationView = mLayoutInflater.inflate(R.layout.station_info, null);
+		flipper.addView(stationView);
+		//closest info
+        View closestView = mLayoutInflater.inflate(R.layout.closest_info, null);
+		flipper.addView(closestView);
+		//navigation info
+        View navigationView = mLayoutInflater.inflate(R.layout.navigation, null);
+		flipper.addView(navigationView);
 	}
+	@Override
+	protected boolean isRouteDisplayed() {
+		return false;
+	}	
 }

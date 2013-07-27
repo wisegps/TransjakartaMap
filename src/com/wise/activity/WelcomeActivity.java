@@ -1,7 +1,6 @@
 package com.wise.activity;
 
 import java.util.ArrayList;
-
 import com.wise.bean.RoadInfo;
 import com.wise.config.UrlConfig;
 import com.wise.net.NetThread;
@@ -10,20 +9,14 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
-import android.view.View;
-import android.widget.ProgressBar;
 
 public class WelcomeActivity extends Activity {
-
-	private ProgressBar waitBar = null;
 	private MyHandler myHandler = null;
-	private RoadInfo roadInfo = new RoadInfo();;
 	private ArrayList<RoadInfo> roadInfos = new ArrayList<RoadInfo>();
 
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.welcome);
-		waitBar = (ProgressBar) findViewById(R.id.progressBar1);
 		myHandler = new MyHandler();
 		new Thread(new NetThread.GetRodListThread(myHandler, UrlConfig.url,
 				UrlConfig.nameSpace, UrlConfig.MethodGetRoadName,
@@ -37,19 +30,16 @@ public class WelcomeActivity extends Activity {
 			String result = msg.obj.toString();
 			String[] array1 = result.split("Road=anyType");
 			for (int i = 1; i < array1.length; i++) {
-				System.out.println(array1[i]);
 				String[] array2 = array1[i].split("; ");
 				RoadInfo roadInfo = new RoadInfo();
 				roadInfo.setRoadName(array2[1].substring(9));
 				roadInfos.add(roadInfo);
 			}
+			UrlConfig.roadInfos = roadInfos;
 			// 跳转显示所有路线
-			roadInfo.setRoadInfos(roadInfos);
-			Intent intent = new Intent();
-			intent.putExtra("roadInfos", roadInfo);
-			intent.setClass(WelcomeActivity.this, MainActivity.class);
+			Intent intent = new Intent(WelcomeActivity.this, MainActivity.class);
 			startActivity(intent);
-			WelcomeActivity.this.finish();
+			finish();
 		}
 	}
 }

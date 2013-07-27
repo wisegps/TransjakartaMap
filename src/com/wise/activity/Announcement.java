@@ -5,8 +5,10 @@ import java.util.List;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import com.wise.config.UrlConfig;
 import com.wise.net.GetSystem;
 import com.wise.net.NetThread;
+import com.wise.service.WebService;
 
 import android.app.Activity;
 import android.content.Context;
@@ -49,23 +51,37 @@ public class Announcement extends Activity {
 	};
 	private void init(){
 		lv_Announcement = (ListView)findViewById(R.id.lv_Announcement);
-		//String url = "http://www.wiselbs.cn/wspub/service.asmx/GetAnnouncementInfo_json";
-		//new Thread(new NetThread.GetDataThread(handler, url, GetData)).start();
+		new Thread(new GetAnnouThread()).start();
 	}
+	class GetAnnouThread extends Thread{
+		@Override
+		public void run() {
+			super.run();
+			try {
+				String result = WebService.GetAnnouncementInfo(UrlConfig.url, UrlConfig.nameSpace, UrlConfig.MethodGetAnnouncementInfo, 2000);
+				Message message = new Message();
+				message.what = GetData;
+				message.obj = result;
+				handler.sendMessage(message);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
+	}
+	
 	/**
 	 * ½âÎöÊý¾Ý
 	 * @param result
 	 */
 	private void jsonData(String result){
 		try {
-			JSONArray jsonArray = new JSONArray(result.substring(1, result.length()-2));
-			for (int i = 0; i < jsonArray.length(); i++) {
-				JSONObject jsonObject = jsonArray.getJSONObject(i);
-				System.out.println(jsonObject.getString("Time").substring(6, 19));
+			String[] str1 = result.split("Announcement=anyType");
+			for(int i = 1 ; i < str1.length ; i++){
+				String[] str2 = str1[i].split("; ");
 				AnnouncementData announcementData = new AnnouncementData();
-				announcementData.setTime(GetSystem.getStrTime(jsonObject.getString("Time").substring(6, 19)));
-				announcementData.setMessage(jsonObject.getString("Message"));
-				announcementData.setKoridor(jsonObject.getString("Koridor"));
+				announcementData.setTime(str2[0].substring(6));
+				announcementData.setMessage(str2[2].substring(8));
+				announcementData.setKoridor(str2[1].substring(8));
 				announcementDatas.add(announcementData);
 			}
 		} catch (Exception e) {

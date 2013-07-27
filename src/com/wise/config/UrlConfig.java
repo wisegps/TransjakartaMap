@@ -1,5 +1,9 @@
 package com.wise.config;
 
+import java.util.ArrayList;
+
+import com.wise.bean.RoadInfo;
+
 public class UrlConfig {
 	//链接地址
 	public static final String url = "http://www.wiselbs.cn/wspubsc/service.asmx";
@@ -23,8 +27,11 @@ public class UrlConfig {
 	public static final String MethodGetDestination2 = "GetDestination2";
 	//取广告信息
 	public static final String MethodGetAD = "GetAD";
+	//获取最新通知
+	public static final String MethodGetAnnouncementInfo = "GetAnnouncementInfo";
 	
 	//设置连接超时
 	public static int timeout = 20000;
 	
+	public static ArrayList<RoadInfo> roadInfos;
 }
