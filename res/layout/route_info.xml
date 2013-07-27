@@ -4,11 +4,15 @@
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
     android:orientation="vertical"
-    android:gravity="center"
     android:background="#ffffff">
-    <TextView 
+    <Spinner 
+        android:id="@+id/s_road"
         android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:text="11111111"/>
+        android:layout_height="wrap_content"/>    
+    <com.google.android.maps.MapView
+        android:id="@+id/MapView"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:apiKey="0Bp_4coG-wdSGGqPGodFcEa1QYXrjhByAEZ4dxA" />
 </LinearLayout>
     
