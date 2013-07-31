@@ -57,6 +57,10 @@ public class NetThread {
 			String str = null;
 			try {
 				str = WebService.SoapGetRoadList(url, nameSpace, method, timeout);
+				Message msg = new Message();
+				msg.what = tWhere;
+				msg.obj = str;
+				tHandler.sendMessage(msg);
 			} catch (Exception e) {
 				Log.e("error------>","Òì³£");
 				Message msg = new Message();
@@ -64,11 +68,6 @@ public class NetThread {
 				msg.obj = "Exception";
 				tHandler.sendMessage(msg);
 				e.printStackTrace();
-			}finally{
-				Message msg = new Message();
-				msg.what = tWhere;
-				msg.obj = str;
-				tHandler.sendMessage(msg);
 			}
 		}
 	}

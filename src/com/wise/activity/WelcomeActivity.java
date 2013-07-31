@@ -9,6 +9,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.widget.Toast;
 
 public class WelcomeActivity extends Activity {
 	private MyHandler myHandler = null;
@@ -28,17 +29,21 @@ public class WelcomeActivity extends Activity {
 		public void handleMessage(Message msg) {
 			super.handleMessage(msg);
 			String result = msg.obj.toString();
-			String[] array1 = result.split("Road=anyType");
-			for (int i = 1; i < array1.length; i++) {
-				String[] array2 = array1[i].split("; ");
-				RoadInfo roadInfo = new RoadInfo();
-				roadInfo.setRoadName(array2[1].substring(9));
-				roadInfos.add(roadInfo);
-			}
-			UrlConfig.roadInfos = roadInfos;
-			// 跳转显示所有路线
-			Intent intent = new Intent(WelcomeActivity.this, MainActivity.class);
-			startActivity(intent);
+			if(result.equals("Exception")){
+				Toast.makeText(getApplicationContext(), "读取公交数据异常", Toast.LENGTH_LONG).show();
+			}else{
+				String[] array1 = result.split("Road=anyType");
+				for (int i = 1; i < array1.length; i++) {
+					String[] array2 = array1[i].split("; ");
+					RoadInfo roadInfo = new RoadInfo();
+					roadInfo.setRoadName(array2[1].substring(9));
+					roadInfos.add(roadInfo);
+				}
+				UrlConfig.roadInfos = roadInfos;
+				// 跳转显示所有路线
+				Intent intent = new Intent(WelcomeActivity.this, MainActivity.class);
+				startActivity(intent);
+			}			
 			finish();
 		}
 	}

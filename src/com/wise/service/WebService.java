@@ -173,4 +173,25 @@ public class WebService {
 		SoapObject result = (SoapObject)envelope.getResponse();		
 		return result.toString();
 	}
+	/**
+	 * 根据站点获取线路
+	 * @param url
+	 * @param nameSpace
+	 * @param methodName
+	 * @param p_strRoadName
+	 * @param timeout
+	 * @return
+	 * @throws Exception
+	 */
+	public static String GetStationsRoad(String url , String nameSpace ,String methodName ,String p_strRoadName, int timeout) throws Exception{
+		SoapObject request = new SoapObject(nameSpace, methodName);
+    	request.addProperty("p_strName", p_strRoadName);
+    	SoapSerializationEnvelope envelope = new SoapSerializationEnvelope(SoapEnvelope.VER11);
+    	envelope.setOutputSoapObject(request);
+    	envelope.dotNet = true;
+    	HttpTransportSE ht = new HttpTransportSE(url,timeout);
+    	ht.call(nameSpace + methodName, envelope);
+		SoapObject result = (SoapObject)envelope.getResponse();		
+		return result.toString();
+	}
 }

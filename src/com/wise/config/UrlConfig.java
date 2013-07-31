@@ -31,6 +31,8 @@ public class UrlConfig {
 	public static final String MethodGetAnnouncementInfo = "GetAnnouncementInfo";
 	//查询公交线路站点位置信息
 	public static final String MethodGetRoadStations = "GetRoadStations";
+	//根据站点获取公交路线
+	public static final String MethodGetRoadByStation = "GetRoadByStation";
 	
 	//设置连接超时
 	public static int timeout = 20000;

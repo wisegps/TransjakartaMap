@@ -5,14 +5,13 @@
     android:layout_height="fill_parent"
     android:orientation="vertical"
     android:background="#ffffff">
-    <Spinner 
-        android:id="@+id/s_road"
+    <TextView 
+        android:id="@+id/tv_road_row_roadname"
         android:layout_width="fill_parent"
-        android:layout_height="wrap_content"/>    
-    <com.google.android.maps.MapView
-        android:id="@+id/MapView"
+        android:layout_height="wrap_content"/>
+    <TextView 
+        android:id="@+id/tv_road_row_stationname"
         android:layout_width="fill_parent"
-        android:layout_height="fill_parent"
-        android:apiKey="0Bp_4coG-wdTWW9pFlT2H-38xGfhItFrWbBEZRg"/>    
+        android:layout_height="wrap_content"/>
 </LinearLayout>
     
