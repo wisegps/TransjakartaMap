@@ -6,4 +6,12 @@
 	<string name="init_road">Initializing.Please wait...</string>
 	<string name="find_station">GetRoadStationInfo</string>
 	<string name="find_in">Are Looking for,Please Wait...</string>
+	<string name="read_error">Date Read Exception</string>
+	
+	<string name="net_unalive">Net Unalive</string>
+	<string name="prompt">Prompt</string>
+	<string name="set_net">Are you want to set net?</string>
+	<string name="sure_set">Sure</string>
+	<string name="cancle">Cancle</string>
+	<string name="google_unalive">No Google Maps</string>
 </resources>

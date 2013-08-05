@@ -1,6 +1,7 @@
 package com.wise.activity;
-
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -79,7 +80,7 @@ public class Announcement extends Activity {
 			for(int i = 1 ; i < str1.length ; i++){
 				String[] str2 = str1[i].split("; ");
 				AnnouncementData announcementData = new AnnouncementData();
-				announcementData.setTime(str2[0].substring(6));
+				announcementData.setTime(str2[0].substring(6).replace("T", " ").replace("-", "/"));
 				announcementData.setMessage(str2[2].substring(8));
 				announcementData.setKoridor(str2[1].substring(8));
 				announcementDatas.add(announcementData);
@@ -97,7 +98,8 @@ public class Announcement extends Activity {
 			return Time;
 		}
 		public void setTime(String time) {
-			Time = time;
+			
+			this.Time = time;
 		}
 		public String getKoridor() {
 			return Koridor;
@@ -137,14 +139,14 @@ public class Announcement extends Activity {
 				convertView = mInflater.inflate(R.layout.announcement_row, null);
 				holder = new ViewHolder();
 				holder.tv_announcement_time = (TextView) convertView.findViewById(R.id.tv_announcement_time);
-				holder.tv_announcement_Koridor = (TextView)convertView.findViewById(R.id.tv_announcement_Koridor);
+//				holder.tv_announcement_Koridor = (TextView)convertView.findViewById(R.id.tv_announcement_Koridor);
 				holder.tv_announcement_Message = (TextView)convertView.findViewById(R.id.tv_announcement_Message);
 				convertView.setTag(holder);
 			} else {
 				holder = (ViewHolder) convertView.getTag();
 			}
 			holder.tv_announcement_time.setText(Datas.get(position).getTime());
-			holder.tv_announcement_Koridor.setText(Datas.get(position).getKoridor());
+//			holder.tv_announcement_Koridor.setText(Datas.get(position).getKoridor());
 			holder.tv_announcement_Message.setText(Datas.get(position).getMessage());
 			return convertView;
 		}

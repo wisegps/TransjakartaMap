@@ -108,6 +108,8 @@ public class BusArrivalActivity extends Activity{
                     float AvgSpeed = 0;
 					//解析车辆数据
 					List<BusArrivalInfo> busArrivalInfos = GetBusArrivalEx(request);
+					
+					
 					if(busArrivalInfos.size() > 0){
 						String result1 = "";
 						//如果当前车的起始站点为当前查询的站点，且Percent为0，显示到达
@@ -250,13 +252,11 @@ public class BusArrivalActivity extends Activity{
 					};
 				}
 				try {
-					System.out.println("线程休眠20s");
 					Thread.sleep(20000);
 				} catch (InterruptedException e) {
 					e.printStackTrace();
 				}
 			}
-			System.out.println("线程关闭,isRun = " + isRun);
 		}
 	}
 	/**

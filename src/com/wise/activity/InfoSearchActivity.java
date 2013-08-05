@@ -12,7 +12,9 @@ import android.graphics.Point;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
@@ -25,6 +27,7 @@ import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 import android.widget.ViewFlipper;
 import com.google.android.maps.GeoPoint;
 import com.google.android.maps.MapActivity;
@@ -38,6 +41,7 @@ import com.wise.service.WebService;
 public class InfoSearchActivity extends MapActivity {
 	static final int GetRoadStations = 1;//根据路线获取站点
 	static final int GetStationsRoad = 2;//根据站点获取路线
+	static final int ShowButton = 3;//显示button按钮
 	
 	ViewFlipper flipper;
 	Button bt_Route_Info,bt_Station_Info,bt_Closest_Info,bt_Navigation,bt_station_search;
@@ -47,7 +51,6 @@ public class InfoSearchActivity extends MapActivity {
 	MapView mMapView;
 	MapController mMapController;
 	List<Overlay> myOverlay;
-	
 
 	List<String> roadList = new ArrayList<String>();//公交信息
 	List<RoadStationsData> roadStationsDatas;//站点信息
@@ -56,6 +59,7 @@ public class InfoSearchActivity extends MapActivity {
 	@Override
 	protected void onCreate(Bundle icicle) {
 		super.onCreate(icicle);
+		
 		init();
 	}
 	Handler handler = new Handler(){
@@ -69,6 +73,14 @@ public class InfoSearchActivity extends MapActivity {
 				break;
 			case GetStationsRoad:
 				GetStationsRoadDatas(msg.obj.toString());
+				break;
+				
+			case ShowButton:
+				bt_Route_Info.setVisibility(View.VISIBLE);
+				bt_Station_Info.setVisibility(View.VISIBLE);
+				bt_Closest_Info.setVisibility(View.VISIBLE);
+				bt_Navigation.setVisibility(View.VISIBLE);
+				System.out.println("Show Button");
 				break;
 			}
 		}		
@@ -107,6 +119,7 @@ public class InfoSearchActivity extends MapActivity {
 		}		
 	}
 	private void BindSpinner(){
+		
 		for(int i = 0 ; i < UrlConfig.roadInfos.size();i++){
 			roadList.add(UrlConfig.roadInfos.get(i).getRoadName());
 		}
@@ -262,6 +275,7 @@ public class InfoSearchActivity extends MapActivity {
 				Message message = new Message();
 				message.what = GetRoadStations;
 				message.obj = result;
+				
 				handler.sendMessage(message);
 			} catch (Exception e) {
 				e.printStackTrace();
@@ -294,20 +308,26 @@ public class InfoSearchActivity extends MapActivity {
 	}
 	
 	private void init(){
+		
 		setContentView(R.layout.info_search);
 		bt_Route_Info = (Button)findViewById(R.id.bt_Route_Info);
-		bt_Route_Info.setOnClickListener(onClickListener);
 		bt_Station_Info = (Button)findViewById(R.id.bt_Station_Info);
-		bt_Station_Info.setOnClickListener(onClickListener);
 		bt_Closest_Info = (Button)findViewById(R.id.bt_Closest_Info);
-		bt_Closest_Info.setOnClickListener(onClickListener);
 		bt_Navigation = (Button)findViewById(R.id.bt_Navigation);
+		
+		//绑定监听
+		bt_Station_Info.setOnClickListener(onClickListener);
+		bt_Closest_Info.setOnClickListener(onClickListener);
+		bt_Route_Info.setOnClickListener(onClickListener);
 		bt_Navigation.setOnClickListener(onClickListener);
+		
+		//设置按钮不可见
+//		buttonUnDisplay();
 		
 		flipper = (ViewFlipper) this.findViewById(R.id.viewFlipper);
         LayoutInflater mLayoutInflater = LayoutInflater.from(InfoSearchActivity.this);        
         //Route Info
-        View routeView = mLayoutInflater.inflate(R.layout.route_info, null);
+        View  routeView = mLayoutInflater.inflate(R.layout.route_info, null);
 		flipper.addView(routeView);
 		s_road = (Spinner)routeView.findViewById(R.id.s_road);
 		mMapView = (MapView) routeView.findViewById(R.id.MapView);
@@ -316,6 +336,15 @@ public class InfoSearchActivity extends MapActivity {
 		mMapView.setEnabled(true);
 		mMapView.setClickable(true);
 		myOverlay = mMapView.getOverlays();
+		
+		
+		routeView.setOnClickListener(new OnClickListener() {
+			public void onClick(View v) {
+				Toast.makeText(InfoSearchActivity.this, "OnClick", 0).show();
+			}
+		});
+		
+		
 		//station info
         View stationView = mLayoutInflater.inflate(R.layout.station_info, null);
 		flipper.addView(stationView);
@@ -335,8 +364,8 @@ public class InfoSearchActivity extends MapActivity {
 	/**
 	 * 站点信息
 	 * @author 唐飞
-	 *
 	 */
+	
 	private class RoadStationsData{
 		String stationName;
 		double lon;
@@ -386,6 +415,8 @@ public class InfoSearchActivity extends MapActivity {
 					+ stationName + "]";
 		}		
 	}
+	
+	//自定义Adapter
 	class RoadAdapter extends BaseAdapter{
 		LayoutInflater mInflater;
 		Context context;
@@ -426,7 +457,19 @@ public class InfoSearchActivity extends MapActivity {
 		private class ViewHolder {
 			TextView tv_road_row_roadname,tv_road_row_stationname;
 		}
-	}	
+	}
+	
+	
+	//设置按钮不可见
+	public void buttonUnDisplay(){
+		bt_Route_Info.setVisibility(View.GONE);
+		bt_Station_Info.setVisibility(View.GONE);
+		bt_Closest_Info.setVisibility(View.GONE);
+		bt_Navigation.setVisibility(View.GONE);
+	}
+	
+	
+	
 	@Override
 	protected boolean isRouteDisplayed() {
 		return false;

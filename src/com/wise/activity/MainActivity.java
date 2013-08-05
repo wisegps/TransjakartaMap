@@ -1,9 +1,16 @@
 package com.wise.activity;
 
+import android.app.AlertDialog;
 import android.app.TabActivity;
+import android.app.AlertDialog.Builder;
+import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.widget.TabHost;
+import android.widget.Toast;
 
 public class MainActivity extends TabActivity {
 	private TabHost tabHost = null;
@@ -12,12 +19,14 @@ public class MainActivity extends TabActivity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.main_activity);
 		tabHost = getTabHost();
-		// 添加标签
+	  	// 添加标签
 		addArrival();
 		addAnnouncement();
 		addInfoSearch();
 		tabHost.setCurrentTab(0);
 	}
+
+
 	// 添加Arrival标签页 第0页
 	public void addArrival() {
 		Intent ArrivalIntent = getIntent();
@@ -45,4 +54,5 @@ public class MainActivity extends TabActivity {
 		InfoSearchSpec.setContent(InfoSearchIntent);
 		getTabHost().addTab(InfoSearchSpec);
 	}
+
 }

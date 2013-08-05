@@ -5,7 +5,9 @@
     android:layout_height="fill_parent"
     android:orientation="vertical"
     android:gravity="center"
-    android:background="#ffffff">
+    android:background="#ffffff"
+    android:onClick="true"
+    >
     <TextView 
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"

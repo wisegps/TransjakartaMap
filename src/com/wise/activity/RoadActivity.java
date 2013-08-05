@@ -10,6 +10,7 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Intent;
+import android.content.res.Resources;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -80,7 +81,7 @@ public class RoadActivity extends Activity {
 			roadStationInfs.clear();
 		}
 		String[] str1 = data.split("Station=anyType");
-		for(int i = 1 ; i < str1.length ; i ++){			
+		for(int i = 1 ; i < str1.length ; i ++){
 			String[] str2 = str1[i].split("; ");
 			RoadStationInf roadStationInf = new RoadStationInf();
 			roadStationInf.setStationID(Integer.valueOf(str2[0].substring(11)));
@@ -104,7 +105,8 @@ public class RoadActivity extends Activity {
 			ArrayAdapter<RoadStationInf> adapter = new ArrayAdapter<RoadStationInf>(getApplicationContext(), android.R.layout.simple_list_item_1, list);
 			stationList.setAdapter(adapter);
 			stationList.setOnItemClickListener(new OnItemClickListener() {
-				public void onItemClick(AdapterView<?> arg0, View arg1,int arg2, long arg3) {					
+				public void onItemClick(AdapterView<?> arg0, View arg1,int arg2, long arg3) {
+					
 					Intent intent = new Intent(RoadActivity.this, BusArrivalActivity.class);
 					intent.putExtra("PointIDA", list.get(arg2).getStationID());
 					intent.putExtra("PointIDB", list.get(arg2).getStationID2());
