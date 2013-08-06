@@ -19,6 +19,7 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
 import android.widget.AdapterView.OnItemSelectedListener;
 import android.widget.ArrayAdapter;
 import android.widget.BaseAdapter;
@@ -67,11 +68,14 @@ public class InfoSearchActivity extends MapActivity {
 		public void handleMessage(Message msg) {
 			super.handleMessage(msg);
 			switch (msg.what) {
+			//获取特定公交路线所有站点信息
 			case GetRoadStations:
 				GetRoadStationsDatas(msg.obj.toString());
 				showRoadStationMap();
 				break;
+				//获取某个站点所属公交路线信息
 			case GetStationsRoad:
+				
 				GetStationsRoadDatas(msg.obj.toString());
 				break;
 				
@@ -114,7 +118,7 @@ public class InfoSearchActivity extends MapActivity {
 	 */
 	private void SearchRoad(){
 		String stationName = et_station_name.getText().toString().trim();
-		if(!stationName.equals("")){
+		if(!"".equals(stationName)){
 			new Thread(new GetStationsRoadThread(stationName)).start();
 		}		
 	}
@@ -129,6 +133,7 @@ public class InfoSearchActivity extends MapActivity {
 		s_road.setOnItemSelectedListener(onItemSelectedListener);
 	}
 	
+	//Spinner点击监听
 	OnItemSelectedListener onItemSelectedListener = new OnItemSelectedListener() {
 		@Override
 		public void onItemSelected(AdapterView<?> arg0, View arg1, int arg2,long arg3) {
@@ -169,6 +174,17 @@ public class InfoSearchActivity extends MapActivity {
 		}
 		RoadAdapter roadAdapter = new RoadAdapter(getApplicationContext(), roadDatas);
 		lv_station_road.setAdapter(roadAdapter);
+		
+		//注册点击监听
+		lv_station_road.setOnItemClickListener(new OnItemClickListener() {
+			public void onItemClick(AdapterView<?> arg0, View arg1, int arg2,long arg3) {
+				RoadData roadData = (RoadData)lv_station_road.getItemAtPosition(arg2);
+				String roadName = roadData.getRoadName();
+				
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+				Toast.makeText(getApplicationContext(), roadName, 0).show();
+			}
+		});
 	}
 	/**
 	 * 在地图上显示站点
@@ -336,14 +352,6 @@ public class InfoSearchActivity extends MapActivity {
 		mMapView.setEnabled(true);
 		mMapView.setClickable(true);
 		myOverlay = mMapView.getOverlays();
-		
-		
-		routeView.setOnClickListener(new OnClickListener() {
-			public void onClick(View v) {
-				Toast.makeText(InfoSearchActivity.this, "OnClick", 0).show();
-			}
-		});
-		
 		
 		//station info
         View stationView = mLayoutInflater.inflate(R.layout.station_info, null);
