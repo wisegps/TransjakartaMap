@@ -3,6 +3,7 @@ package com.wise.activity;
 import java.util.ArrayList;
 import java.util.List;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
@@ -56,6 +57,9 @@ public class InfoSearchActivity extends MapActivity {
 	List<String> roadList = new ArrayList<String>();//公交信息
 	List<RoadStationsData> roadStationsDatas;//站点信息
 	List<RoadData> roadDatas; //根据站点查询的线路信息
+	int index = 0;
+	int index1 = 0;
+	boolean isSearch = false;
 	
 	@Override
 	protected void onCreate(Bundle icicle) {
@@ -70,7 +74,8 @@ public class InfoSearchActivity extends MapActivity {
 			switch (msg.what) {
 			//获取特定公交路线所有站点信息
 			case GetRoadStations:
-				GetRoadStationsDatas(msg.obj.toString());
+				Bundle bundle = msg.peekData();
+				GetRoadStationsDatas(msg.obj.toString(),bundle.getString("RoadName"));
 				showRoadStationMap();
 				break;
 				//获取某个站点所属公交路线信息
@@ -99,7 +104,6 @@ public class InfoSearchActivity extends MapActivity {
 				break;
 			case R.id.bt_Station_Info:		
 				flipper.setDisplayedChild(1);
-				System.out.println("1");
 				break;
 			case R.id.bt_Closest_Info:	
 				flipper.setDisplayedChild(2);
@@ -137,25 +141,39 @@ public class InfoSearchActivity extends MapActivity {
 	OnItemSelectedListener onItemSelectedListener = new OnItemSelectedListener() {
 		@Override
 		public void onItemSelected(AdapterView<?> arg0, View arg1, int arg2,long arg3) {
-			new Thread(new GetRoadStationsThread(roadList.get(arg2))).start();
+			
+			new Thread(new GetRoadStationsThread(roadList.get(arg2),"")).start();
 		}
 		@Override
 		public void onNothingSelected(AdapterView<?> arg0) {}
 	};	
+	
+	
 	/**
 	 * 解析站点信息
 	 * @param result
 	 */
-	private void GetRoadStationsDatas(String result){
+	private void GetRoadStationsDatas(String result,String roadName){
+		
 		roadStationsDatas = new ArrayList<RoadStationsData>();
+		roadStationsDatas.clear();
 		String[] str1 = result.split("RoadInfo=anyType");
 		for (int i = 1; i < str1.length; i++) {
 			String[] str2 = str1[i].split("; ");
 			RoadStationsData roadStationsData = new RoadStationsData();
+			roadStationsData.setFullName(str2[9].substring(9));
 			roadStationsData.setStationName(str2[8].substring(10));
 			roadStationsData.setLat(Double.parseDouble(str2[6].substring(4)));
 			roadStationsData.setLon(Double.parseDouble(str2[5].substring(4)));
 			roadStationsDatas.add(roadStationsData);
+		}
+		
+		
+		for(int i = 0 ; i <  roadStationsDatas.size() ; i ++){
+			RoadStationsData roadStationsData = roadStationsDatas.get(i);
+				if(roadName.equals(roadStationsData.getFullName())){
+					index = i ;
+				}
 		}
 	}
 	/**
@@ -180,34 +198,55 @@ public class InfoSearchActivity extends MapActivity {
 			public void onItemClick(AdapterView<?> arg0, View arg1, int arg2,long arg3) {
 				RoadData roadData = (RoadData)lv_station_road.getItemAtPosition(arg2);
 				String roadName = roadData.getRoadName();
-				
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-				Toast.makeText(getApplicationContext(), roadName, 0).show();
+				String stationName = roadData.getStationName();
+				//地图上显示站点所在公交路线
+				flipper.setDisplayedChild(0);
+				new Thread(new GetRoadStationsThread(roadName,stationName)).start();
+				isSearch = true;
 			}
 		});
 	}
+	
+	
 	/**
 	 * 在地图上显示站点
 	 */
 	private void showRoadStationMap(){
 		myOverlay.clear();
 		Bitmap bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.station);
+		Bitmap bitmap1 = BitmapFactory.decodeResource(getResources(), R.drawable.station1);
+		StationOverlay stationOverlays = null;
+		
+		//画线
 		for(int j = 0; j < roadStationsDatas.size()-1;j++ ){
 			GeoPoint geoPoint1 = new GeoPoint((int)(roadStationsDatas.get(j).getLat()*1E6), (int)(roadStationsDatas.get(j).getLon()*1E6));
 			GeoPoint geoPoint2 = new GeoPoint((int)(roadStationsDatas.get(j+1).getLat()*1E6), (int)(roadStationsDatas.get(j+1).getLon()*1E6));
 			LineOverlay lineOverlay = new LineOverlay(geoPoint1, geoPoint2);
 			myOverlay.add(lineOverlay);
 		}
+		//画站点
 		for(int i = 0; i < roadStationsDatas.size(); i++) {
-			roadStationsDatas.get(i).getLat();
 			GeoPoint geoPoint = new GeoPoint((int)(roadStationsDatas.get(i).getLat()*1E6), (int)(roadStationsDatas.get(i).getLon()*1E6));
-			StationOverlay stationOverlay = new StationOverlay(geoPoint, bitmap, roadStationsDatas.get(i).getStationName());
-			System.out.println(roadStationsDatas.get(i).getStationName());
-			myOverlay.add(stationOverlay);
+			StationOverlay stationOverlay = null;
+			if(i == index){
+				GeoPoint geoPoint1 = new GeoPoint((int)(roadStationsDatas.get(i).getLat()*1E6), (int)(roadStationsDatas.get(i).getLon()*1E6));
+				stationOverlays = new StationOverlay(geoPoint1, bitmap1, roadStationsDatas.get(i).getStationName());
+			}else{
+				stationOverlay = new StationOverlay(geoPoint, bitmap, roadStationsDatas.get(i).getStationName());
+			}
+			if(stationOverlays != null){
+				myOverlay.add(stationOverlays);
+			}
+			if(stationOverlay != null){
+				myOverlay.add(stationOverlay);
+			}
 		}
 		if(roadStationsDatas!=null){
-			GeoPoint geoPoint = new GeoPoint((int)(roadStationsDatas.get(0).getLat()*1E6), (int)(roadStationsDatas.get(0).getLon()*1E6));
+			System.out.println("lat----------->" + (int)(roadStationsDatas.get(index).getLat()));
+			System.out.println("lon----------->" + (int)(roadStationsDatas.get(index).getLon()));
+			GeoPoint geoPoint = new GeoPoint((int)(roadStationsDatas.get(index).getLat()*1E6), (int)(roadStationsDatas.get(index).getLon()*1E6));
 			mMapController.animateTo(geoPoint);
+			index = 0 ;
 		}
 	}
 	
@@ -233,8 +272,8 @@ public class InfoSearchActivity extends MapActivity {
             Point myScreenCoords = new Point();
             // 将经纬度转换成实际屏幕坐标
             mapView.getProjection().toPixels(geoPoint, myScreenCoords);
-            paint.setStrokeWidth(1);
-            paint.setARGB(255, 255, 0, 0);
+			paint.setStrokeWidth(1);
+			paint.setARGB(255, 255, 0, 0);
             paint.setStyle(Paint.Style.STROKE);
             canvas.drawBitmap(bitmap, myScreenCoords.x - bitmap.getWidth()/2, myScreenCoords.y - bitmap.getHeight()/2, paint);
             canvas.drawText(stationName, myScreenCoords.x, myScreenCoords.y - bitmap.getHeight()/2, paint);
@@ -272,16 +311,16 @@ public class InfoSearchActivity extends MapActivity {
 		}
 	}
 	
-	
-	
 	class GetRoadStationsThread extends Thread{
 		String RoadName;
+		String stationName;
 		/**
 		 * 读取站点信息
 		 * @param RoadName 线路名称
 		 */
-		public GetRoadStationsThread(String RoadName){
+		public GetRoadStationsThread(String RoadName,String stationName){
 			this.RoadName = RoadName;
+			this.stationName = stationName;
 		}
 		@Override
 		public void run() {
@@ -291,6 +330,10 @@ public class InfoSearchActivity extends MapActivity {
 				Message message = new Message();
 				message.what = GetRoadStations;
 				message.obj = result;
+				
+				Bundle bundle = new Bundle();
+				bundle.putString("RoadName", stationName);
+				message.setData(bundle);
 				
 				handler.sendMessage(message);
 			} catch (Exception e) {
@@ -359,6 +402,8 @@ public class InfoSearchActivity extends MapActivity {
 		et_station_name = (EditText)findViewById(R.id.et_station_name);
 		bt_station_search = (Button)findViewById(R.id.bt_station_search);
 		bt_station_search.setOnClickListener(onClickListener);
+		
+		
 		lv_station_road = (ListView)findViewById(R.id.lv_station_road);
 		//closest info
         View closestView = mLayoutInflater.inflate(R.layout.closest_info, null);
@@ -371,11 +416,13 @@ public class InfoSearchActivity extends MapActivity {
 	}
 	/**
 	 * 站点信息
-	 * @author 唐飞
+	 * @author Administrator
 	 */
+	
 	
 	private class RoadStationsData{
 		String stationName;
+		String fullName;
 		double lon;
 		double lat;
 		public String getStationName() {
@@ -395,6 +442,13 @@ public class InfoSearchActivity extends MapActivity {
 		}
 		public void setLat(double lat) {
 			this.lat = lat;
+		}
+		
+		public void setFullName(String fullName){
+			this.fullName = fullName;
+		}
+		public String getFullName(){
+			return fullName;
 		}
 		@Override
 		public String toString() {
